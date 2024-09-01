@@ -1,8 +1,8 @@
 import { MongoClient, ObjectId } from 'mongodb';
 
 export default async function handler(req, res) {
-    if (req.method === 'POST') {
-        const { id, task } = req.body;
+    if (req.method === 'PUT') {
+        const { id, task, status } = req.body;
 
         let client;
 
@@ -11,10 +11,13 @@ export default async function handler(req, res) {
             const db = client.db();
 
             // Insert the task into the "completedTasks" collection
-            await db.collection('completedTasks').insertOne({ task });
+            // await db.collection('completedTasks').insertOne({ task });
 
             // Optionally, remove the task from the "todolist" collection
-            await db.collection('todolist').deleteOne({ _id: new ObjectId(id) });
+            const result = await db.collection('todolist').updateOne(
+                { _id: new ObjectId(id) }, // Find the document by id
+                { $set: { status: 'completed' } } // Set the status to 'complete'
+            );
 
             res.status(201).json({ message: 'Task moved to completedTasks' });
         } catch (error) {
