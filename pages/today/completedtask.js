@@ -5,33 +5,32 @@ import { MongoClient } from 'mongodb';
 import { useState } from 'react';
 function completedTasks(props) {
     const [tasks, setTasks] = useState(props.DUMMY_MEETUPS);
-    const handleDelete = async (id) => {
+    const handleDeleteTask = async (id) => {
         try {
             const response = await fetch(`/api/delete-task?id=${id}`, {
                 method: 'DELETE',
             });
             const result = await response.json();
+
             if (response.ok) {
-                // Optionally, refresh the page or update the state
-                console.log(result.message);
-                
-                // window.location.reload(); // Simple way to refresh data
+                // Remove the deleted task from the state
+                setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
             } else {
-                console.error('Failed to delete:', result.error);
+                console.error('Failed to delete task:', result.error);
             }
         } catch (error) {
             console.error('Error:', error);
         }
     };
-
     return (
         <div>
             <h1>Today</h1>
-            {props.DUMMY_MEETUPS.map(meetup => (
+            {tasks.map(meetup => (
                  <Task key={meetup.id} 
             task={meetup.task} 
             id={meetup.id} 
-            handleDelete={handleDelete}  />
+            onDelete={handleDeleteTask}
+                    />
                 
             ))
 
@@ -44,8 +43,8 @@ export async function getServerSideProps(){
     // fetch data from an API
     const client = await MongoClient.connect("mongodb+srv://monalicg2407:MdAI8yK7oAeDJeV2@cluster0.ltq9m.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
     const db = client.db();
-    const meetupsCollection = db.collection("completedTasks");
-    const meetups = await meetupsCollection.find().toArray();
+    const meetupsCollection = db.collection("todolist");
+    const meetups = await meetupsCollection.find({ status: 'completed' }).toArray();
     client.close();
 
 

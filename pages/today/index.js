@@ -54,11 +54,11 @@ function TodoList(props) {
     const handleMoveTask = async (id, task) => {
         try {
             const response = await fetch('/api/move-task', {
-                method: 'POST',
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ id, task }),
+                body: JSON.stringify({ id, task, status: 'completed' }),
             });
 
             const result = await response.json();
