@@ -13,7 +13,8 @@ function TodoList(props) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ task: newTask }),
+                body: JSON.stringify({ task: newTask,status: 'incomplete'  }),
+
             });
 
             const result = await response.json();
